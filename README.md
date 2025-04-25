@@ -1,0 +1,2 @@
+# ICPC
+Lecturer: Alimzhan Amanov
