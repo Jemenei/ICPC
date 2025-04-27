@@ -1,61 +1,57 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
 
-const long long max_n = 1e12;
-const int sqrt_max_n = 1000000;
-vector<long long> almostPrimes;
+
+typedef long long ll;
+vector<ll> almost_primes;
 
 
-void findAlmostPrimes() {
-    vector<bool> isPrime(sqrt_max_n + 1, true);
-    vector<long long> primes;
+void precompute() {
+    const int lim = 1e6 + 1;
+    vector<bool> is_prime(lim, true);
 
-    for(long long i = 2; i <= sqrt_max_n; i++) {
-        if(isPrime[i]) {
-            primes.push_back(i);
-            for(long long j = i * i; j <= sqrt_max_n; j+= i) {
-                isPrime[j] = false;
+    for(int i = 2; i * i < lim; ++i) {
+        if(is_prime[i]) {
+            for(int j = i * i; j < lim; j += i) {
+                is_prime[j] = false;
             }
         }
     }
 
 
-    for(long long p : primes) {
-        long long power = p * p;
-        while(power <= max_n) {
-            almostPrimes.push_back(power);
-            if(power > max_n / p) {
-                break;
+    for(int i = 2; i < lim; ++i) {
+        if(is_prime[i]) {
+            ll x = (ll)i * i;
+            while (x <= 1e12) {
+                almost_primes.push_back(x);
+                x *= i;
             }
-            power *= p;
         }
     }
-
-    sort(almostPrimes.begin(), almostPrimes.end());
+    sort(almost_primes.begin(), almost_primes.end());
 }
 
-
-int countAlmostPrimes(long long low, long long high) {
-    return upper_bound(almostPrimes.begin(), almostPrimes.end(), high) - lower_bound(almostPrimes.begin(), almostPrimes.end(), low);
-}
 
 
 int main() {
     ios::sync_with_stdio(false);
-    cin.tie(0);
-
-    findAlmostPrimes();
+    cin.tie(nullptr);
+    precompute();
 
     int n; cin >> n;
 
     while(n--) {
-        long long low, high; cin >> low >> high;
-        cout << countAlmostPrimes(low, high) << "\n";
-    }
+        ll low, high;
+        cin >> low >> high;
+        auto left = lower_bound(almost_primes.begin(), almost_primes.end(), low);
+        auto right = upper_bound(almost_primes.begin(), almost_primes.end(), high);
 
+        cout << right - left << "\n";
+    }
     return 0;
 }
